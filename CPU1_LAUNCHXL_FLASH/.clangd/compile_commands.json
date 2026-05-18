@@ -1,0 +1,27 @@
+[
+   {
+      "directory" : "C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH",
+      "command"   : "clang++ -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll\" -I\"C:/ti/C2000Ware_26_00_00_00\" -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/device\" -I\"C:/ti/C2000Ware_26_00_00_00/driverlib/f28004x/driverlib/\" -I\"C:/ti/ccs2041/ccs/tools/compiler/ti-cgt-c2000_22.6.3.LTS/include\" -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/libraries/spll\" -DDEBUG -D_LAUNCHXL_F280049C -D_FLASH -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH/syscfg\" -DF28004x=1 -xc",
+      "file"      : "C:/Users/Intern 1/workspace_ccstheia/totempole_spll/device/device.c"
+   },
+   {
+      "directory" : "C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH",
+      "command"   : "clang++ -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll\" -I\"C:/ti/C2000Ware_26_00_00_00\" -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/device\" -I\"C:/ti/C2000Ware_26_00_00_00/driverlib/f28004x/driverlib/\" -I\"C:/ti/ccs2041/ccs/tools/compiler/ti-cgt-c2000_22.6.3.LTS/include\" -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/libraries/spll\" -DDEBUG -D_LAUNCHXL_F280049C -D_FLASH -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH/syscfg\" -DF28004x=1",
+      "file"      : "C:/Users/Intern 1/workspace_ccstheia/totempole_spll/device/f28004x_codestartbranch.asm"
+   },
+   {
+      "directory" : "C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH",
+      "command"   : "clang++ -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll\" -I\"C:/ti/C2000Ware_26_00_00_00\" -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/device\" -I\"C:/ti/C2000Ware_26_00_00_00/driverlib/f28004x/driverlib/\" -I\"C:/ti/ccs2041/ccs/tools/compiler/ti-cgt-c2000_22.6.3.LTS/include\" -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/libraries/spll\" -DDEBUG -D_LAUNCHXL_F280049C -D_FLASH -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH/syscfg\" -DF28004x=1 -xc",
+      "file"      : "C:/Users/Intern 1/workspace_ccstheia/totempole_spll/spll_sample_study.c"
+   },
+   {
+      "directory" : "C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH",
+      "command"   : "clang++ -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll\" -I\"C:/ti/C2000Ware_26_00_00_00\" -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/device\" -I\"C:/ti/C2000Ware_26_00_00_00/driverlib/f28004x/driverlib/\" -I\"C:/ti/ccs2041/ccs/tools/compiler/ti-cgt-c2000_22.6.3.LTS/include\" -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/libraries/spll\" -DDEBUG -D_LAUNCHXL_F280049C -D_FLASH -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH/syscfg\" -DF28004x=1 -xc",
+      "file"      : "C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH/syscfg/board.c"
+   },
+   {
+      "directory" : "C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH",
+      "command"   : "clang++ -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll\" -I\"C:/ti/C2000Ware_26_00_00_00\" -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/device\" -I\"C:/ti/C2000Ware_26_00_00_00/driverlib/f28004x/driverlib/\" -I\"C:/ti/ccs2041/ccs/tools/compiler/ti-cgt-c2000_22.6.3.LTS/include\" -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/libraries/spll\" -DDEBUG -D_LAUNCHXL_F280049C -D_FLASH -I\"C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH/syscfg\" -DF28004x=1 -xc",
+      "file"      : "C:/Users/Intern 1/workspace_ccstheia/totempole_spll/CPU1_LAUNCHXL_FLASH/syscfg/c2000ware_libraries.c"
+   }
+]
