@@ -6,29 +6,33 @@
 #include "math.h"
 #include "spll_1ph_sogi.h"
 
-
-
-
-// Initialize the PLL object
-SPLL_1PH_SOGI spll1;
-// Constants for the PLL
+// --- CONSTANTS ---
 #define GRID_FREQ 50.0f
-#define ISR_FREQ  10000.0f  // Matching with adcA1_ISR (100us)
+#define SLOW_ISR_FREQ 10000.0f  // 10kHz for Voltage Loop and PLL
+#define FAST_ISR_FREQ 50000.0f  // 50kHz for Current Loop
 
-#define PWM_PERIOD 1666 //60khz // calculation 100Mhz/required freaquency
+
+#define PWM_PERIOD 2000         // 100MHz / 50kHz / 1 = 2000 (Up-count)
 #define ADC_OFFSET 2048 // offset is get by measuring the AC sense signal at zero ac voltage ((that point of DC voltage)/3.3)*4096
 //for the pwm scheduler
 #define dead_band 40 //400 nanoseconds no of cycles * (1/100MHz)
 
-volatile uint16_t currentDuty = 322; //volatile is used since it is modified in interrupt
+// Phase angle for 500us blanking at 50Hz (approx 0.157 rad)
+#define BLANKING_ANGLE_RAD 0.157f 
+#define PI_VAL 3.14159265f
+#define TWO_PI_VAL 6.2831853f
 
+// Initialize the PLL object
+SPLL_1PH_SOGI spll1;
+
+volatile uint16_t currentDuty = 322; //volatile is used since it is modified in interrupt
 volatile bool pwm_flag = false;
 
 //for tripping logic
 
 //rms calculation new
 // 2048 counts = 325V. Scale = 325/2048 = 0.15869
-const float VOLTS_PER_COUNT = 0.15869f;
+
 volatile uint32_t sum_squares_ac =0;
 volatile float final_rms = 0.0f;
 volatile float final_dc_voltage = 0.0f;
@@ -36,26 +40,37 @@ volatile float final_dc_voltage = 0.0f;
 //ADC timer_isr variables
 volatile uint32_t temp_sum_squares = 0;
 volatile uint16_t sample_counter = 0;
-
-volatile uint32_t temp_sum_raw_dc = 0;
-volatile uint32_t sum_raw_dc = 0;
-
-volatile uint16_t raw_cal_dc = 0;
 volatile uint16_t flatline_counter = 0;
 volatile bool data_ready_flag = false;
-const float ADC_SCALE_AC = 325.0f / 2048.0f;
-const float ADC_SCALE_DC = 294.0f / 4096.0f;
+
+
+const float ADC_SCALE_AC = 339.0f / 2048.0f;
+const float ADC_SCALE_DC = 497.0f / 4096.0f;
+const float ADC_SCALE_L_I = 9.972 / 2048.0f;
+
 SPLL_1PH_SOGI spll1;
 volatile float ac_vol_normalized = 0.0f;
 
+// Control Loop Variables
+volatile float v_dc_meas = 0.0f;
+volatile float i_ac_meas = 0.0f;
+
+volatile float v_dc_ref = 380.0f; // Target DC Bus Voltage
+volatile float i_ref_amplitude = 0.0f; // Output of Voltage Loop
+volatile float i_ref_inst = 0.0f;      // Instantaneous current reference
+volatile float currentDutyFloat = 0.0f;
+
 void initEPWM_HFL(void);
 void initEPWM_LFL(void);
-
 void initADC(void);
 void initSCIA(void);
 
 void sendSCIText(char *msg);
-__interrupt void adcA1_ISR(void);
+
+
+__interrupt void fastCurrentLoop_ISR(void);
+__interrupt void slowVoltageLoop_ISR(void);
+
 
 void main(void)
 {
@@ -68,21 +83,21 @@ void main(void)
     // Initialize the PIE vector table with pointers to the shell Interrupt
     // Service Routines (ISR).
     Interrupt_initVectorTable();
-    Interrupt_register(INT_ADCA1, &adcA1_ISR);
+    Interrupt_register(INT_ADCA1, &fastCurrentLoop_ISR); // 50kHz
+    Interrupt_register(INT_ADCA2, &slowVoltageLoop_ISR); // 10kHz
+
 
     // PinMux and Peripheral Initialization
     Board_init();
     initEPWM_HFL();
     initEPWM_LFL();
-
     initADC();
     initSCIA();
 
     SPLL_1PH_SOGI_reset(&spll1);
-    // Typical coefficients for 50Hz grid sampled at 10kHz
-    SPLL_1PH_SOGI_config(&spll1, GRID_FREQ, ISR_FREQ, 166.9743f, -166.2124f);
+    // Config PLL for 10kHz ISR rate
+    SPLL_1PH_SOGI_config(&spll1, GRID_FREQ, FAST_ISR_FREQ, 166.9743f, -166.2124f);
     SPLL_1PH_SOGI_coeff_calc(&spll1);
-
 
     // C2000Ware Library initialization
     C2000Ware_libraries_init();
@@ -98,34 +113,35 @@ void main(void)
    
     while(1)
     {
+         // Background tasks (SCI/UART printing, state machine logic, fault checking)
+        // Do NOT put control logic in the while loop.
         if(data_ready_flag)
         {
-            float mean_square = (float)sum_squares_ac *0.005f;
+            float mean_square = (float)sum_squares_ac *0.001f;
             float rms_counts = sqrtf(mean_square);
             final_rms = rms_counts * ADC_SCALE_AC;
 
-            float mean_sum_raw_dc = (float)sum_raw_dc *0.005f;
-            final_dc_voltage = mean_sum_raw_dc * ADC_SCALE_DC ;
+            final_dc_voltage = v_dc_meas;
 
-            if(final_rms >= 30.0f && final_dc_voltage < 120.0f)
+            if(final_rms >= 50.0f && final_dc_voltage < 300.0f)
             {
                 pwm_flag = true;
              
 
             }
-            else if (final_rms < 20.0f)
+            else if (final_rms < 40.0f)
             {
                 pwm_flag = false;
                 
                
             }
-            else if (final_dc_voltage >= 150.0f) 
+            else if (final_dc_voltage >= 350.0f) 
             {
                 pwm_flag = false;
                 
             }
             data_ready_flag = false;
-            sprintf(buffer2, "DC_BUS_ADC: %d | DC_voltage : %d | Sin RMS: %d | duty : %d \r\n\r\n  ", raw_cal_dc , (int)final_dc_voltage, (int)final_rms , currentDuty);
+            sprintf(buffer2, " DC_voltage : %d | Sin RMS: %d | duty : %u \r\n\r\n  ", (int)final_dc_voltage, (int)final_rms , currentDuty);
             sendSCIText(buffer2);
            
         }
@@ -133,91 +149,131 @@ void main(void)
     }
 }
 
-//interrupts that run every 100us that timmer 3
-__interrupt void adcA1_ISR(void)
+// SLOW LOOP: 10kHz (Triggered by EPWM6 SOCB prescaled by 5)
+__interrupt void slowVoltageLoop_ISR(void)
 {
-        int16_t adj;
-    uint16_t raw_ac = 0;
-    uint16_t raw_dc = 0 ;
-    raw_ac = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER0);
-    raw_dc = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER1);
-    raw_cal_dc = raw_dc;
-    //ac adc section
-    // Normalize AC input to -1.0 to 1.0 range for the PLL
-    // (Assuming 2048 is zero cross and peak is approx 4095)
-    ac_vol_normalized = ((float)raw_ac - ADC_OFFSET) / 2048.0f;
-    // 2. Run the PLL
-    SPLL_1PH_SOGI_run(&spll1, ac_vol_normalized);
 
+    // 1. Read ADC for Voltage
+    uint16_t raw_v_dc = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER1);
+    
+
+    v_dc_meas = (float)raw_v_dc * ADC_SCALE_DC;
+    
+    
+    // 3. Voltage Loop PI Controller (runs at 10kHz)
+    // NOTE: Insert your actual Voltage PI controller math here. 
+    // Error = v_dc_ref - v_dc_meas;
+    // i_ref_amplitude = PI_Output(Error); 
+       
+    ADC_clearInterruptStatus(ADCA_BASE, ADC_INT_NUMBER2);
+    Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP10);
+}
+
+// FAST LOOP: 50kHz (Triggered by EPWM6 SOCA prescaled by 1)
+
+__interrupt void fastCurrentLoop_ISR(void)
+{
+    // 1. Read ADC for Current
+        int16_t adj;
+    uint16_t raw_i_ac = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER0);
+    uint16_t raw_v_ac = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER2);
+
+        float ac_vol_normalized = ((float)raw_v_ac - 2048.0f) / 2048.0f;
+
+    // 2. Run PLL
+    SPLL_1PH_SOGI_run(&spll1, ac_vol_normalized);  // Normalize AC voltage for PLL (-1.0 to 1.0)
     // 3. Extract Phase Information
     // spll1.sine   -> Normalized sine wave in phase with Grid
     // spll1.theta  -> The phase angle (0 to 2*PI)
-// ZERO-CROSSING BLANKING LOGIC
-    // -----------------------------------------------------------
-    // Define the blanking window (e.g., 0.05 = 5% of peak AC voltage)
-    // You can increase this value to make the delay longer.
-    float zero_cross_threshold = 0.08f; 
 
-    // Check if system is ON *AND* we are OUTSIDE the zero-crossing window
-    if (pwm_flag == true && fabsf(spll1.sine) >= zero_cross_threshold) 
+    i_ac_meas = ((float)raw_i_ac - 2048.0f) * ADC_SCALE_L_I;
+
+    // 2. Generate instantaneous current reference
+    // sine from SOGI is in phase with grid voltage
+    i_ref_inst = i_ref_amplitude * spll1.sine; 
+
+
+
+    // 3. Current Loop PI Controller (runs at 50kHz)
+    // NOTE: Insert your actual Current PI controller math here.
+    // Error = i_ref_inst - i_ac_meas;
+    // DutyCycle = PI_Output(Error);
+    
+    // Dummy duty calculation for structure demonstration
+    // currentDutyFloat = 0.5f; // Replace with PI output (0.0 to 1.0)
+    // currentDuty = (uint16_t)(currentDutyFloat * PWM_PERIOD);
+
+    // 4. Zero-Crossing Blanking Logic using Phase Angle (Theta)
+    float theta = spll1.theta; // 0 to 2*PI
+
+
+    bool in_blanking_window = (theta < BLANKING_ANGLE_RAD) || 
+                              (theta > (PI_VAL - BLANKING_ANGLE_RAD) && theta < (PI_VAL + BLANKING_ANGLE_RAD)) ||
+                              (theta > (TWO_PI_VAL - BLANKING_ANGLE_RAD));
+
+    if (pwm_flag && !in_blanking_window) 
     {
-        // 1. Clear the trips (Turn the FETs back on)
+        // Turn FETs ON
         EPWM_clearTripZoneFlag(EPWM6_BASE, EPWM_TZ_FLAG_OST);
         EPWM_clearTripZoneFlag(EPWM5_BASE, EPWM_TZ_FLAG_OST);
 
-        // 2. Apply Normal Modulation
+        // Grid Polarity based switching (Totem Pole Logic)
         if (spll1.sine >= 0) {
-            // Positive Half
+            // Positive Half Cycle
             EPWM_setCounterCompareValue(EPWM6_BASE, EPWM_COUNTER_COMPARE_A, currentDuty);
-            EPWM_setActionQualifierContSWForceAction(EPWM5_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_SW_OUTPUT_HIGH);
+            
+            // LFL logic: Phase A tied low, Phase B tied high (depends on your hardware schematic)
+            EPWM_setActionQualifierContSWForceAction(EPWM5_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_SW_OUTPUT_HIGH); 
+            EPWM_setActionQualifierContSWForceAction(EPWM5_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_SW_OUTPUT_LOW);
         } else {
-            // Negative Half
+            // Negative Half Cycle
             EPWM_setCounterCompareValue(EPWM6_BASE, EPWM_COUNTER_COMPARE_A, PWM_PERIOD - currentDuty);
+            
+            // LFL logic reversed
             EPWM_setActionQualifierContSWForceAction(EPWM5_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_SW_OUTPUT_LOW);
+            EPWM_setActionQualifierContSWForceAction(EPWM5_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_SW_OUTPUT_HIGH);
         }
     } 
     else 
     {
-        // BLANKING WINDOW OR SYSTEM OFF
-        // Safely force all high-frequency and low-frequency FETs OFF
+        // BLANKING WINDOW or FAULT: Force all OFF via Trip Zone
         EPWM_forceTripZoneEvent(EPWM6_BASE, EPWM_TZ_FORCE_EVENT_OST);
         EPWM_forceTripZoneEvent(EPWM5_BASE, EPWM_TZ_FORCE_EVENT_OST);
     }
-    // -----------------------------------------------------------
-   
-    if(raw_ac <= 150)
+
+    if(raw_v_ac <= 150)
     {
         flatline_counter++;
     }
 
-    adj = (int16_t)raw_ac - ADC_OFFSET;
+    adj = (int16_t)raw_v_ac - ADC_OFFSET;
     temp_sum_squares += (uint32_t)((int32_t)adj * (int32_t)adj);
-    temp_sum_raw_dc += (uint32_t)raw_cal_dc ;
-    sample_counter++;
-    if(sample_counter >= 200)
+    sample_counter ++;
+    if(sample_counter >= 1000)
     {
-        if (flatline_counter < 180 )
+        if (flatline_counter < 480 )
         {
             sum_squares_ac = temp_sum_squares;
-            sum_raw_dc = temp_sum_raw_dc ;
+           
         }
         else
         {
             sum_squares_ac = 0;
-            sum_raw_dc = temp_sum_raw_dc ;
         }
         sample_counter = 0;
         temp_sum_squares = 0;
-        temp_sum_raw_dc = 0;
+        
         flatline_counter = 0;
         data_ready_flag = true;
     }
 
-    ADC_forceSOC(ADCA_BASE, ADC_SOC_NUMBER0);
-    ADC_forceSOC(ADCA_BASE, ADC_SOC_NUMBER1);
+
+
     ADC_clearInterruptStatus(ADCA_BASE, ADC_INT_NUMBER1);
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
 }
+
+
 
 //adc initializationfor output and input
 void initADC(void)
@@ -228,18 +284,28 @@ void initADC(void)
     ADC_enableConverter(ADCA_BASE);
     DEVICE_DELAY_US(1000);
 
-// Remove ADC_TRIGGER_SW_ONLY and replace with EPWM6 SOCA
-    ADC_setupSOC(ADCA_BASE, ADC_SOC_NUMBER0, ADC_TRIGGER_EPWM6_SOCA, ADC_CH_ADCIN6, 15);
-    ADC_setupSOC(ADCA_BASE, ADC_SOC_NUMBER1, ADC_TRIGGER_EPWM6_SOCA, ADC_CH_ADCIN5, 15); 
-
+    // SOC0: AC Current (Fast Loop, Triggered by EPWM6 SOCA)
+    ADC_setupSOC(ADCA_BASE, ADC_SOC_NUMBER0, ADC_TRIGGER_EPWM6_SOCA, ADC_CH_ADCIN4, 15);
     ADC_setInterruptSource(ADCA_BASE, ADC_INT_NUMBER1, ADC_SOC_NUMBER0);
     ADC_enableInterrupt(ADCA_BASE, ADC_INT_NUMBER1);
     ADC_clearInterruptStatus(ADCA_BASE, ADC_INT_NUMBER1);
 
+//slow loop 
+// Remove ADC_TRIGGER_SW_ONLY and replace with EPWM6 SOCA
+    ADC_setupSOC(ADCA_BASE, ADC_SOC_NUMBER1, ADC_TRIGGER_EPWM6_SOCB, ADC_CH_ADCIN6, 15);
+    ADC_setupSOC(ADCA_BASE, ADC_SOC_NUMBER2, ADC_TRIGGER_EPWM6_SOCA, ADC_CH_ADCIN5, 15); //AC_voltage
+        // SOC1 & SOC2: DC Voltage & AC Voltage (Slow Loop, Triggered by EPWM6 SOCB)
+    ADC_setInterruptSource(ADCA_BASE, ADC_INT_NUMBER2, ADC_SOC_NUMBER1);// Trigger on last conversion (SOC2)
+    ADC_enableInterrupt(ADCA_BASE, ADC_INT_NUMBER2);
+    ADC_clearInterruptStatus(ADCA_BASE, ADC_INT_NUMBER2);
+       // Generate INT2 at the end of SOC2 (Wait for both voltages to finish)
     // Prime the ADC so the first ISR pass has valid data to read
     ADC_forceSOC(ADCA_BASE, ADC_SOC_NUMBER0);
     ADC_forceSOC(ADCA_BASE, ADC_SOC_NUMBER1);
+    ADC_forceSOC(ADCA_BASE, ADC_SOC_NUMBER2);
+
     Interrupt_enable(INT_ADCA1);
+    Interrupt_enable(INT_ADCA2);
 }
 
 
@@ -304,13 +370,20 @@ void initEPWM_HFL(void)
     EPWM_setFallingEdgeDelayCount(EPWM6_BASE, dead_band);
 
     // Add this to initEPWM_HFL()
-    EPWM_setADCTriggerSource(EPWM6_BASE, EPWM_SOC_A, EPWM_SOC_TBCTR_ZERO); // Sample at CTR=0
-    EPWM_setADCTriggerEventPrescale(EPWM6_BASE, EPWM_SOC_A, 6); // Trigger every 6th PWM pulse (10kHz control loop from 60kHz PWM)
+    EPWM_setADCTriggerSource(EPWM6_BASE, EPWM_SOC_A, EPWM_SOC_TBCTR_ZERO);
+    EPWM_setADCTriggerSource(EPWM6_BASE, EPWM_SOC_B, EPWM_SOC_TBCTR_ZERO);
+    
+    // SOCA triggers every 1 count (50kHz -> Fast Loop)
+    EPWM_setADCTriggerEventPrescale(EPWM6_BASE, EPWM_SOC_A, 1);
+    // SOCB triggers every 5 counts (50kHz / 5 = 10kHz -> Slow Loop)
+    EPWM_setADCTriggerEventPrescale(EPWM6_BASE, EPWM_SOC_B, 5); 
+     // Trigger every 6th PWM pulse (10kHz control loop from 60kHz PWM)
     EPWM_enableADCTrigger(EPWM6_BASE, EPWM_SOC_A);
+    EPWM_enableADCTrigger(EPWM6_BASE, EPWM_SOC_B);
 
     EPWM_setTripZoneAction(EPWM6_BASE, EPWM_TZ_ACTION_EVENT_TZA, EPWM_TZ_ACTION_LOW);
     EPWM_setTripZoneAction(EPWM6_BASE, EPWM_TZ_ACTION_EVENT_TZB, EPWM_TZ_ACTION_LOW);
-    EPWM_clearTripZoneFlag(EPWM6_BASE, EPWM_TZ_FLAG_OST);
+   // EPWM_clearTripZoneFlag(EPWM6_BASE, EPWM_TZ_FLAG_OST);
 
 }
 
