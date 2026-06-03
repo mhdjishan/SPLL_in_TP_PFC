@@ -25,7 +25,7 @@
 // Initialize the PLL object
 SPLL_1PH_SOGI spll1;
 
-volatile uint16_t currentDuty = 322; //volatile is used since it is modified in interrupt
+volatile uint16_t currentDuty = 400; //volatile is used since it is modified in interrupt
 volatile bool pwm_flag = false;
 
 //for tripping logic
@@ -36,6 +36,7 @@ volatile bool pwm_flag = false;
 volatile uint32_t sum_squares_ac =0;
 volatile float final_rms = 0.0f;
 volatile float final_dc_voltage = 0.0f;
+volatile float instant_ac_i = 0.0f;
 
 //ADC timer_isr variables
 volatile uint32_t temp_sum_squares = 0;
@@ -54,6 +55,7 @@ volatile float ac_vol_normalized = 0.0f;
 // Control Loop Variables
 volatile float v_dc_meas = 0.0f;
 volatile float i_ac_meas = 0.0f;
+
 
 volatile float v_dc_ref = 380.0f; // Target DC Bus Voltage
 volatile float i_ref_amplitude = 0.0f; // Output of Voltage Loop
@@ -112,7 +114,7 @@ void main(void)
     char buffer2[100];
    
     while(1)
-    {
+    {   instant_ac_i = i_ac_meas ;
          // Background tasks (SCI/UART printing, state machine logic, fault checking)
         // Do NOT put control logic in the while loop.
         if(data_ready_flag)
@@ -123,7 +125,7 @@ void main(void)
 
             final_dc_voltage = v_dc_meas;
 
-            if(final_rms >= 50.0f && final_dc_voltage < 300.0f)
+            if(final_rms >= 60.0f && final_dc_voltage < 300.0f)
             {
                 pwm_flag = true;
              
@@ -141,7 +143,7 @@ void main(void)
                 
             }
             data_ready_flag = false;
-            sprintf(buffer2, " DC_voltage : %d | Sin RMS: %d | duty : %u \r\n\r\n  ", (int)final_dc_voltage, (int)final_rms , currentDuty);
+            sprintf(buffer2, " DC_voltage : %d | Sin RMS: %d | current : %d | duty : %u \r\n\r\n  ", (int)final_dc_voltage, (int)final_rms , (int)instant_ac_i , currentDuty);
             sendSCIText(buffer2);
            
         }
@@ -213,12 +215,9 @@ __interrupt void fastCurrentLoop_ISR(void)
 
     if (pwm_flag && !in_blanking_window) 
     {
-        // Turn FETs ON
-        EPWM_clearTripZoneFlag(EPWM6_BASE, EPWM_TZ_FLAG_OST);
-        EPWM_clearTripZoneFlag(EPWM5_BASE, EPWM_TZ_FLAG_OST);
-
+     
         // Grid Polarity based switching (Totem Pole Logic)
-        if (spll1.sine >= 0) {
+        if (theta < PI_VAL) {
             // Positive Half Cycle
             EPWM_setCounterCompareValue(EPWM6_BASE, EPWM_COUNTER_COMPARE_A, currentDuty);
             
@@ -233,6 +232,10 @@ __interrupt void fastCurrentLoop_ISR(void)
             EPWM_setActionQualifierContSWForceAction(EPWM5_BASE, EPWM_AQ_OUTPUT_A, EPWM_AQ_SW_OUTPUT_LOW);
             EPWM_setActionQualifierContSWForceAction(EPWM5_BASE, EPWM_AQ_OUTPUT_B, EPWM_AQ_SW_OUTPUT_HIGH);
         }
+
+       // Turn FETs ON
+        EPWM_clearTripZoneFlag(EPWM5_BASE, EPWM_TZ_FLAG_OST);
+        EPWM_clearTripZoneFlag(EPWM6_BASE, EPWM_TZ_FLAG_OST);
     } 
     else 
     {
@@ -286,7 +289,8 @@ void initADC(void)
 
     // SOC0: AC Current (Fast Loop, Triggered by EPWM6 SOCA)
     ADC_setupSOC(ADCA_BASE, ADC_SOC_NUMBER0, ADC_TRIGGER_EPWM6_SOCA, ADC_CH_ADCIN4, 15);
-    ADC_setInterruptSource(ADCA_BASE, ADC_INT_NUMBER1, ADC_SOC_NUMBER0);
+    ADC_setInterruptSource(ADCA_BASE, ADC_INT_NUMBER1, ADC_SOC_NUMBER2);
+
     ADC_enableInterrupt(ADCA_BASE, ADC_INT_NUMBER1);
     ADC_clearInterruptStatus(ADCA_BASE, ADC_INT_NUMBER1);
 
@@ -295,7 +299,7 @@ void initADC(void)
     ADC_setupSOC(ADCA_BASE, ADC_SOC_NUMBER1, ADC_TRIGGER_EPWM6_SOCB, ADC_CH_ADCIN6, 15);
     ADC_setupSOC(ADCA_BASE, ADC_SOC_NUMBER2, ADC_TRIGGER_EPWM6_SOCA, ADC_CH_ADCIN5, 15); //AC_voltage
         // SOC1 & SOC2: DC Voltage & AC Voltage (Slow Loop, Triggered by EPWM6 SOCB)
-    ADC_setInterruptSource(ADCA_BASE, ADC_INT_NUMBER2, ADC_SOC_NUMBER1);// Trigger on last conversion (SOC2)
+    ADC_setInterruptSource(ADCA_BASE, ADC_INT_NUMBER2, ADC_SOC_NUMBER1);
     ADC_enableInterrupt(ADCA_BASE, ADC_INT_NUMBER2);
     ADC_clearInterruptStatus(ADCA_BASE, ADC_INT_NUMBER2);
        // Generate INT2 at the end of SOC2 (Wait for both voltages to finish)
@@ -370,8 +374,12 @@ void initEPWM_HFL(void)
     EPWM_setFallingEdgeDelayCount(EPWM6_BASE, dead_band);
 
     // Add this to initEPWM_HFL()
-    EPWM_setADCTriggerSource(EPWM6_BASE, EPWM_SOC_A, EPWM_SOC_TBCTR_ZERO);
-    EPWM_setADCTriggerSource(EPWM6_BASE, EPWM_SOC_B, EPWM_SOC_TBCTR_ZERO);
+
+    // Set CMPC to the exact midpoint of the PWM period (1000)
+    EPWM_setCounterCompareValue(EPWM6_BASE, EPWM_COUNTER_COMPARE_C, 1000);
+    // Trigger ADC at CMPC, far away from all hard-switching edges
+    EPWM_setADCTriggerSource(EPWM6_BASE, EPWM_SOC_A, EPWM_SOC_TBCTR_U_CMPC);
+    EPWM_setADCTriggerSource(EPWM6_BASE, EPWM_SOC_B, EPWM_SOC_TBCTR_U_CMPC);
     
     // SOCA triggers every 1 count (50kHz -> Fast Loop)
     EPWM_setADCTriggerEventPrescale(EPWM6_BASE, EPWM_SOC_A, 1);
