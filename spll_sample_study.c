@@ -20,6 +20,10 @@
 #define PI_VAL              3.14159265f
 #define TWO_PI_VAL          6.2831853f
 
+//limits
+#define MAX_DUTY 0.95f
+#define MIN_DUTY 0.01f
+
 // --- SCALING FACTORS ---
 const float ADC_SCALE_AC  = 339.0f / 2048.0f;
 const float ADC_SCALE_DC  = 497.0f / 4096.0f;
@@ -56,6 +60,7 @@ volatile float i_ac_meas = 0.0f;
 volatile float v_dc_ref = 380.0f;      // Target DC Bus Voltage
 volatile float i_ref_amplitude = 0.0f; // Output of Voltage Loop
 volatile float i_ref_inst = 0.0f;      // Instantaneous current reference
+volatile float currentDutyFloat = 0.0f;
 
 // --- FUNCTION PROTOTYPES ---
 void initEPWM_HFL(void);
@@ -165,8 +170,25 @@ __interrupt void fastCurrentLoop_ISR(void)
     i_ac_meas = ((float)raw_i_ac - ADC_OFFSET) * ADC_SCALE_L_I;
     i_ref_inst = i_ref_amplitude * spll1.sine; 
 
-    float theta = spll1.theta; // 0 to 2*PI
+    //starting of close loop feed forward term
+    float peak_grid_vol = final_rms * 1.4142f; 
+    float abs_v_ac_inst = fabsf(peak_grid_vol * spll1.sine);
 
+     float duty_feedforward = 0.0f;
+    if (v_dc_meas > 10.0f) { 
+        duty_feedforward = 1.0f - (abs_v_ac_inst / v_dc_meas);     // D = 1 - (Vin/Vout)
+    }
+
+    currentDutyFloat = duty_feedforward ;
+    if (currentDutyFloat > MAX_DUTY) {
+        currentDutyFloat = MAX_DUTY;
+    } else if (currentDutyFloat < MIN_DUTY) {
+        currentDutyFloat = MIN_DUTY;
+    }
+
+    currentDuty = (uint16_t)(currentDutyFloat * PWM_PERIOD);
+
+    float theta = spll1.theta; // 0 to 2*PI
     // Zero-Crossing Blanking Logic
     bool in_blanking_window = (theta < BLANKING_ANGLE_RAD) || 
                               (theta > (PI_VAL - BLANKING_ANGLE_RAD) && theta < (PI_VAL + BLANKING_ANGLE_RAD)) ||
@@ -376,3 +398,12 @@ void initEPWM_LFL(void)
 
 // End of File
 //
+//what is remaing
+
+////hardware over-current protection mapped to the CMPSS (Comparator Subsystem)
+// You Forgot the Auto-Zero Calibration!
+// your op-amps are not perfect. Subtracting exactly 2048 will cause your SOGI PLL to vibrate and your current RMS readout to be completely wrong when the board is resting.
+//  Please make sure you add the current_adc_offset logic to calculate the true hardware zero-point when the PFC is off! with help of example code
+//* find a method to ofset auto correction
+//* find a method to make all the sense are ok at the initially INDUSTRIAL PRE-FLIGHT CHECKS and other safty feature like sensor fault etc
+// flat line issue wll solve when auto offset adjust is implemented

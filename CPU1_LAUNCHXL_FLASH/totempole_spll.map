@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v22.6.3                     
 ******************************************************************************
->> Linked Fri Jun  5 13:56:49 2026
+>> Linked Fri Jun  5 16:42:05 2026
 
 OUTPUT FILE NAME:   <totempole_spll.out>
 ENTRY POINT SYMBOL: "code_start"  address: 00080000
@@ -24,7 +24,7 @@ PAGE 0:
   FLASH_BANK0_SEC2      00082000   00001000  00001000  00000000  RWIX
   FLASH_BANK0_SEC3      00083000   00001000  00001000  00000000  RWIX
   FLASH_BANK0_SEC4      00084000   00001000  00000572  00000a8e  RWIX
-  FLASH_BANK0_SEC5      00085000   00001000  000009c8  00000638  RWIX
+  FLASH_BANK0_SEC5      00085000   00001000  00000a25  000005db  RWIX
   FLASH_BANK0_SEC6      00086000   00001000  00000000  00001000  RWIX
   FLASH_BANK0_SEC7      00087000   00001000  00000000  00001000  RWIX
   FLASH_BANK0_SEC8      00088000   00001000  00000000  00001000  RWIX
@@ -56,7 +56,7 @@ PAGE 0:
 PAGE 1:
   BOOT_RSVD             00000002   000000f1  00000000  000000f1  RWIX
   RAMM1                 00000400   000003f8  000003f8  00000000  RWIX
-  RAMLS5                0000a800   00000800  0000006f  00000791  RWIX
+  RAMLS5                0000a800   00000800  00000071  0000078f  RWIX
   RAMLS6                0000b000   00000800  00000000  00000800  RWIX
   RAMLS7                0000b800   00000800  00000000  00000800  RWIX
   RAMGS0                0000c000   00002000  00000000  00002000  RWIX
@@ -91,12 +91,12 @@ codestart
 .bss       1    0000a800    00000042     UNINITIALIZED
                   0000a800    00000042     spll_sample_study.obj (.bss)
 
-.data      1    0000a842    0000002d     UNINITIALIZED
-                  0000a842    00000022     spll_sample_study.obj (.data)
-                  0000a864    00000006     rts2800_fpu32_eabi.lib : exit.c.obj (.data)
-                  0000a86a    00000002                            : _lock.c.obj (.data:_lock)
-                  0000a86c    00000002                            : _lock.c.obj (.data:_unlock)
-                  0000a86e    00000001                            : errno.c.obj (.data)
+.data      1    0000a842    0000002f     UNINITIALIZED
+                  0000a842    00000024     spll_sample_study.obj (.data)
+                  0000a866    00000006     rts2800_fpu32_eabi.lib : exit.c.obj (.data)
+                  0000a86c    00000002                            : _lock.c.obj (.data:_lock)
+                  0000a86e    00000002                            : _lock.c.obj (.data:_unlock)
+                  0000a870    00000001                            : errno.c.obj (.data)
 
 .const     0    00084000    00000572     
                   00084000    00000101     rts2800_fpu32_eabi.lib : ctype.c.obj (.const:.string:_ctypes_)
@@ -135,10 +135,10 @@ codestart
 .text.1    0    00082000    00001000     
                   00082000    000006c2     rts2800_fpu32_eabi.lib : _printfi.c.obj (.text)
                   000826c2    00000614                            : _printfi.c.obj (.text:__TI_printfi)
-                  00082cd6    0000016a     spll_sample_study.obj (.text:SPLL_1PH_SOGI_run)
-                  00082e40    0000012f     spll_sample_study.obj (.text:fastCurrentLoop_ISR)
-                  00082f6f    0000008b     rts2800_fpu32_eabi.lib : fd_div28.asm.obj (.text)
-                  00082ffa    00000006     spll_sample_study.obj (.text:Interrupt_clearACKGroup)
+                  00082cd6    0000018c     spll_sample_study.obj (.text:fastCurrentLoop_ISR)
+                  00082e62    0000016a     spll_sample_study.obj (.text:SPLL_1PH_SOGI_run)
+                  00082fcc    00000032     rts2800_fpu32_eabi.lib : sprintf.c.obj (.text)
+                  00082ffe    00000002                            : pre_init.c.obj (.text)
 
 .text.2    0    00083000    00001000     
                   00083000    00000107     rts2800_fpu32_eabi.lib : ll_div28.asm.obj (.text)
@@ -150,162 +150,162 @@ codestart
                   000834ec    000000ab     spll_sample_study.obj (.text:initEPWM_HFL)
                   00083597    000000a9     rts2800_fpu32_eabi.lib : s_scalbn.c.obj (.text)
                   00083640    0000009c                            : fd_add28.asm.obj (.text)
-                  000836dc    00000083                            : fd_mpy28.asm.obj (.text)
-                  0008375f    00000075     spll_sample_study.obj (.text:EPWM_setADCTriggerSource)
-                  000837d4    00000073     driverlib_eabi.lib : sysctl.obj (.text:DCC_setCounterSeeds)
-                  00083847    00000066     spll_sample_study.obj (.text:initEPWM_LFL)
-                  000838ad    00000062     device.obj (.text:Device_init)
-                  0008390f    0000005e     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_getClock)
-                  0008396d    0000005b     spll_sample_study.obj (.text:SPLL_1PH_SOGI_reset)
-                  000839c8    0000005a     rts2800_fpu32_eabi.lib : s_frexp.c.obj (.text)
-                  00083a22    00000052     driverlib_eabi.lib : gpio.obj (.text:GPIO_setPadConfig)
-                  00083a74    00000051     spll_sample_study.obj (.text:initSCIA)
-                  00083ac5    0000004d     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_selectOscSource)
-                  00083b12    0000004c                        : adc.obj (.text:ADC_setVREF)
-                  00083b5e    00000049     spll_sample_study.obj (.text:slowVoltageLoop_ISR)
-                  00083ba7    00000046     spll_sample_study.obj (.text:ADC_setupSOC)
-                  00083bed    00000040     spll_sample_study.obj (.text:EPWM_setActionQualifierAction)
-                  00083c2d    00000040     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_pollX1Counter)
-                  00083c6d    00000040                        : sysctl.obj (.text:SysCtl_selectXTAL)
-                  00083cad    0000003e     spll_sample_study.obj (.text:EPWM_setCounterCompareShadowLoadMode)
-                  00083ceb    0000003e     driverlib_eabi.lib : sci.obj (.text:SCI_setConfig)
-                  00083d29    0000003d                        : interrupt.obj (.text:Interrupt_initModule)
-                  00083d66    0000003a     spll_sample_study.obj (.text:EPWM_setADCTriggerEventPrescale)
-                  00083da0    0000003a     driverlib_eabi.lib : gpio.obj (.text:GPIO_setAnalogMode)
-                  00083dda    0000003a     spll_sample_study.obj (.text:initADCC)
-                  00083e14    00000039     spll_sample_study.obj (.text:initADCA)
-                  00083e4d    00000037     spll_sample_study.obj (.text:EPWM_setFallingEdgeDeadBandDelayInput)
-                  00083e84    00000037     driverlib_eabi.lib : gpio.obj (.text:GPIO_setPinConfig)
-                  00083ebb    00000037                        : gpio.obj (.text:GPIO_setQualificationMode)
-                  00083ef2    00000037                        : interrupt.obj (.text:Interrupt_enable)
-                  00083f29    00000032     rts2800_fpu32_eabi.lib : sprintf.c.obj (.text)
-                  00083f5b    00000031     driverlib_eabi.lib : gpio.obj (.text:GPIO_setDirectionMode)
-                  00083f8c    00000031     rts2800_fpu32_eabi.lib : atoi.c.obj (.text)
-                  00083fbd    00000030                            : _ltoa.c.obj (.text)
-                  00083fed    00000013     spll_sample_study.obj (.text:ADC_enableConverter)
+                  000836dc    0000008b                            : fd_div28.asm.obj (.text)
+                  00083767    00000083                            : fd_mpy28.asm.obj (.text)
+                  000837ea    00000075     spll_sample_study.obj (.text:EPWM_setADCTriggerSource)
+                  0008385f    00000073     driverlib_eabi.lib : sysctl.obj (.text:DCC_setCounterSeeds)
+                  000838d2    00000066     spll_sample_study.obj (.text:initEPWM_LFL)
+                  00083938    00000062     device.obj (.text:Device_init)
+                  0008399a    0000005e     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_getClock)
+                  000839f8    0000005b     spll_sample_study.obj (.text:SPLL_1PH_SOGI_reset)
+                  00083a53    0000005a     rts2800_fpu32_eabi.lib : s_frexp.c.obj (.text)
+                  00083aad    00000052     driverlib_eabi.lib : gpio.obj (.text:GPIO_setPadConfig)
+                  00083aff    00000051     spll_sample_study.obj (.text:initSCIA)
+                  00083b50    0000004d     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_selectOscSource)
+                  00083b9d    0000004c                        : adc.obj (.text:ADC_setVREF)
+                  00083be9    00000049     spll_sample_study.obj (.text:slowVoltageLoop_ISR)
+                  00083c32    00000046     spll_sample_study.obj (.text:ADC_setupSOC)
+                  00083c78    00000040     spll_sample_study.obj (.text:EPWM_setActionQualifierAction)
+                  00083cb8    00000040     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_pollX1Counter)
+                  00083cf8    00000040                        : sysctl.obj (.text:SysCtl_selectXTAL)
+                  00083d38    0000003e     spll_sample_study.obj (.text:EPWM_setCounterCompareShadowLoadMode)
+                  00083d76    0000003e     driverlib_eabi.lib : sci.obj (.text:SCI_setConfig)
+                  00083db4    0000003d                        : interrupt.obj (.text:Interrupt_initModule)
+                  00083df1    0000003a     spll_sample_study.obj (.text:EPWM_setADCTriggerEventPrescale)
+                  00083e2b    0000003a     driverlib_eabi.lib : gpio.obj (.text:GPIO_setAnalogMode)
+                  00083e65    0000003a     spll_sample_study.obj (.text:initADCC)
+                  00083e9f    00000039     spll_sample_study.obj (.text:initADCA)
+                  00083ed8    00000037     spll_sample_study.obj (.text:EPWM_setFallingEdgeDeadBandDelayInput)
+                  00083f0f    00000037     driverlib_eabi.lib : gpio.obj (.text:GPIO_setPinConfig)
+                  00083f46    00000037                        : gpio.obj (.text:GPIO_setQualificationMode)
+                  00083f7d    00000037                        : interrupt.obj (.text:Interrupt_enable)
+                  00083fb4    00000031                        : gpio.obj (.text:GPIO_setDirectionMode)
+                  00083fe5    0000001a     spll_sample_study.obj (.text:ADC_readResult)
+                  00083fff    00000001     c2000ware_libraries.obj (.text:C2000Ware_libraries_init)
 
-.text.3    0    00085000    000009c8     
-                  00085000    0000002f     spll_sample_study.obj (.text:ADC_setInterruptSource)
-                  0008502f    0000002e     rts2800_fpu32_eabi.lib : copy_decompress_lzss.c.obj (.text:decompress:lzss)
-                  0008505d    0000002c     spll_sample_study.obj (.text:EPWM_setActionQualifierContSWForceAction)
-                  00085089    0000002c     spll_sample_study.obj (.text:EPWM_setDeadBandDelayMode)
-                  000850b5    0000002b     spll_sample_study.obj (.text:EPWM_isBaseValid)
-                  000850e0    0000002b     rts2800_fpu32_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit)
-                  0008510b    0000002a     spll_sample_study.obj (.text:SPLL_1PH_SOGI_config)
-                  00085135    0000002a     rts2800_fpu32_eabi.lib : fd_cmp28.asm.obj (.text)
-                  0008515f    0000002a                            : l_div28.asm.obj (.text)
-                  00085189    00000029                            : exit.c.obj (.text)
-                  000851b2    00000028     driverlib_eabi.lib : adc.obj (.text:ADC_setOffsetTrimAll)
-                  000851da    00000027     spll_sample_study.obj (.text:EPWM_setRisingEdgeDeadBandDelayInput)
-                  00085201    00000025     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_selectXTALSingleEnded)
-                  00085226    00000025     spll_sample_study.obj (.text:initADCB)
-                  0008524b    00000024     driverlib_eabi.lib : sysctl.obj (.text:DCC_enableSingleShotMode)
-                  0008526f    00000024     spll_sample_study.obj (.text:EPWM_setDeadBandDelayPolarity)
-                  00085293    00000024     rts2800_fpu32_eabi.lib : s_copysign.c.obj (.text)
-                  000852b7    00000022     spll_sample_study.obj (.text:EPWM_setCounterCompareValue)
-                  000852d9    00000022     spll_sample_study.obj (.text:EPWM_setTripZoneAction)
-                  000852fb    00000021     rts2800_fpu32_eabi.lib : fd_toi28.asm.obj (.text)
-                  0008531c    00000020     spll_sample_study.obj (.text:ADC_enableInterrupt)
-                  0008533c    0000001f     spll_sample_study.obj (.text:EPWM_clearTripZoneFlag)
-                  0008535b    0000001f     spll_sample_study.obj (.text:EPWM_forceTripZoneEvent)
-                  0008537a    0000001f     rts2800_fpu32_eabi.lib : fd_tol28.asm.obj (.text)
-                  00085399    0000001e     driverlib_eabi.lib : sysctl.obj (.text:DCC_setCounter1ClkSource)
-                  000853b7    0000001e     spll_sample_study.obj (.text:EPWM_setPhaseShift)
-                  000853d5    0000001e     driverlib_eabi.lib : interrupt.obj (.text:Interrupt_initVectorTable)
-                  000853f3    0000001e     rts2800_fpu32_eabi.lib : ll_cmp28.asm.obj (.text)
-                  00085411    0000001d     spll_sample_study.obj (.text:EPWM_setFallingEdgeDelayCount)
-                  0008542e    0000001d     spll_sample_study.obj (.text:EPWM_setRisingEdgeDelayCount)
-                  0008544b    0000001d     spll_sample_study.obj (.text:SCI_enableFIFO)
-                  00085468    0000001d     rts2800_fpu32_eabi.lib : i_tofd28.asm.obj (.text)
-                  00085485    0000001d                            : memcpy.c.obj (.text)
-                  000854a2    0000001c     driverlib_eabi.lib : sysctl.obj (.text:DCC_setCounter0ClkSource)
-                  000854be    0000001c     spll_sample_study.obj (.text:EPWM_enableADCTrigger)
-                  000854da    0000001c     spll_sample_study.obj (.text:EPWM_setClockPrescaler)
-                  000854f6    0000001c     rts2800_fpu32_eabi.lib : l_tofd28.asm.obj (.text)
-                  00085512    0000001a     spll_sample_study.obj (.text:ADC_readResult)
-                  0008552c    0000001a     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_getLowSpeedClock)
-                  00085546    00000019     spll_sample_study.obj (.text:SCI_writeCharBlockingFIFO)
-                  0008555f    00000018     driverlib_eabi.lib : sci.obj (.text:SCI_disableModule)
-                  00085577    00000018     spll_sample_study.obj (.text:SCI_resetChannels)
-                  0008558f    00000018     spll_sample_study.obj (.text:SCI_resetRxFIFO)
-                  000855a7    00000018     spll_sample_study.obj (.text:SCI_resetTxFIFO)
-                  000855bf    00000018     spll_sample_study.obj (.text:SysCtl_disablePeripheral)
-                  000855d7    00000018     rts2800_fpu32_eabi.lib : ll_aox28.asm.obj (.text)
-                  000855ef    00000017     spll_sample_study.obj (.text:ADC_forceSOC)
-                  00085606    00000017     driverlib_eabi.lib : adc.obj (.text:ADC_isBaseValid)
-                  0008561d    00000017     spll_sample_study.obj (.text:ADC_isBaseValid)
-                  00085634    00000017     device.obj (.text:SysCtl_enablePeripheral)
-                  0008564b    00000017     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_enablePeripheral)
-                  00085662    00000017     spll_sample_study.obj (.text:SysCtl_enablePeripheral)
-                  00085679    00000017     rts2800_fpu32_eabi.lib : boot28.asm.obj (.text)
-                  00085690    00000016     spll_sample_study.obj (.text:ADC_setPrescaler)
-                  000856a6    00000016     driverlib_eabi.lib : sysctl.obj (.text:DCC_disableDoneSignal)
-                  000856bc    00000016                        : sysctl.obj (.text:DCC_enableDoneSignal)
-                  000856d2    00000016                        : interrupt.obj (.text:Interrupt_defaultHandler)
-                  000856e8    00000015                        : sysctl.obj (.text:DCC_clearDoneFlag)
-                  000856fd    00000015                        : sysctl.obj (.text:DCC_clearErrorFlag)
-                  00085712    00000015                        : sysctl.obj (.text:DCC_disableErrorSignal)
-                  00085727    00000015                        : sysctl.obj (.text:DCC_enableErrorSignal)
-                  0008573c    00000015     device.obj (.text:GPIO_unlockPortConfig)
-                  00085751    00000014     spll_sample_study.obj (.text:ADC_clearInterruptStatus)
-                  00085765    00000014     driverlib_eabi.lib : sysctl.obj (.text:DCC_disableModule)
-                  00085779    00000014                        : sysctl.obj (.text:DCC_enableModule)
-                  0008578d    00000014     spll_sample_study.obj (.text:EPWM_setTimeBaseCounterMode)
-                  000857a1    00000014     spll_sample_study.obj (.text:EPWM_setTimeBasePeriod)
-                  000857b5    00000014     driverlib_eabi.lib : gpio.obj (.text:GPIO_isPinValid)
-                  000857c9    00000014     spll_sample_study.obj (.text:SCI_getTxFIFOStatus)
-                  000857dd    00000013     driverlib_eabi.lib : sci.obj (.text:SCI_enableModule)
-                  000857f0    00000013     spll_sample_study.obj (.text:SCI_enableModule)
-                  00085803    00000013     spll_sample_study.obj (.text:SCI_enableRxModule)
-                  00085816    00000013     spll_sample_study.obj (.text:SCI_enableTxModule)
-                  00085829    00000013     driverlib_eabi.lib : sci.obj (.text:SCI_isBaseValid)
-                  0008583c    00000013     spll_sample_study.obj (.text:SCI_isBaseValid)
-                  0008584f    00000010     driverlib_eabi.lib : sysctl.obj (.text:DCC_isBaseValid)
-                  0008585f    00000010     device.obj (.text:Device_initGPIO)
-                  0008586f    00000010     driverlib_eabi.lib : flash.obj (.text:Flash_isCtrlBaseValid)
-                  0008587f    00000010                        : flash.obj (.text:Flash_isECCBaseValid)
-                  0008588f    00000010     rts2800_fpu32_eabi.lib : memccpy.c.obj (.text)
-                  0008589f    0000000f     device.obj (.text:ASysCtl_disableDCDC)
-                  000858ae    0000000f     spll_sample_study.obj (.text:Interrupt_register)
-                  000858bd    0000000f     spll_sample_study.obj (.text:sendSCIText)
-                  000858cc    0000000e     rts2800_fpu32_eabi.lib : fd_sub28.asm.obj (.text)
-                  000858da    0000000d     driverlib_eabi.lib : interrupt.obj (.text:Interrupt_disableGlobal)
-                  000858e7    0000000d                        : interrupt.obj (.text:Interrupt_enableGlobal)
-                  000858f4    0000000d     device.obj (.text:SysCtl_setLowSpeedClock)
-                  00085901    0000000d     rts2800_fpu32_eabi.lib : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset)
-                  0008590e    0000000c                            : args_main.c.obj (.text)
-                  0008591a    0000000c                            : strchr.c.obj (.text)
-                  00085926    0000000b     device.obj (.text:SysCtl_disableWatchdog)
-                  00085931    0000000b     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_isMCDClockFailureDetected)
-                  0008593c    0000000b     spll_sample_study.obj (.text:__relaxed_cosf)
-                  00085947    0000000b     spll_sample_study.obj (.text:__relaxed_sinf)
-                  00085952    0000000b     rts2800_fpu32_eabi.lib : wcslen.c.obj (.text)
-                  0008595d    0000000a     driverlib_eabi.lib : interrupt.obj (.text:Interrupt_illegalOperationHandler)
-                  00085967    0000000a                        : interrupt.obj (.text:Interrupt_nmiHandler)
-                  00085971    00000009     spll_sample_study.obj (.text:__relaxed_sqrtf)
-                  0008597a    00000009     rts2800_fpu32_eabi.lib : _lock.c.obj (.text)
-                  00085983    00000009                            : fd_neg28.asm.obj (.text)
-                  0008598c    00000008                            : copy_decompress_none.c.obj (.text:decompress:none)
-                  00085994    00000008     f28004x_codestartbranch.obj (.text)
-                  0008599c    00000008     rts2800_fpu32_eabi.lib : strlen.c.obj (.text)
-                  000859a4    00000007     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_resetMCD)
-                  000859ab    00000007     device.obj (.text:__error__)
-                  000859b2    00000007     rts2800_fpu32_eabi.lib : memset.c.obj (.text)
-                  000859b9    00000005     board.obj (.text:Board_init)
-                  000859be    00000005     rts2800_fpu32_eabi.lib : strcpy.c.obj (.text)
-                  000859c3    00000002                            : pre_init.c.obj (.text)
-                  000859c5    00000001     c2000ware_libraries.obj (.text:C2000Ware_libraries_init)
-                  000859c6    00000001     board.obj (.text:PinMux_init)
-                  000859c7    00000001     rts2800_fpu32_eabi.lib : startup.c.obj (.text)
+.text.3    0    00085000    00000a25     
+                  00085000    00000031     rts2800_fpu32_eabi.lib : atoi.c.obj (.text)
+                  00085031    00000030                            : _ltoa.c.obj (.text)
+                  00085061    0000002f     spll_sample_study.obj (.text:ADC_setInterruptSource)
+                  00085090    0000002e     rts2800_fpu32_eabi.lib : copy_decompress_lzss.c.obj (.text:decompress:lzss)
+                  000850be    0000002c     spll_sample_study.obj (.text:EPWM_setActionQualifierContSWForceAction)
+                  000850ea    0000002c     spll_sample_study.obj (.text:EPWM_setDeadBandDelayMode)
+                  00085116    0000002b     spll_sample_study.obj (.text:EPWM_isBaseValid)
+                  00085141    0000002b     rts2800_fpu32_eabi.lib : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit)
+                  0008516c    0000002a     spll_sample_study.obj (.text:SPLL_1PH_SOGI_config)
+                  00085196    0000002a     rts2800_fpu32_eabi.lib : fd_cmp28.asm.obj (.text)
+                  000851c0    0000002a                            : l_div28.asm.obj (.text)
+                  000851ea    00000029                            : exit.c.obj (.text)
+                  00085213    00000028     driverlib_eabi.lib : adc.obj (.text:ADC_setOffsetTrimAll)
+                  0008523b    00000027     spll_sample_study.obj (.text:EPWM_setRisingEdgeDeadBandDelayInput)
+                  00085262    00000025     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_selectXTALSingleEnded)
+                  00085287    00000025     spll_sample_study.obj (.text:initADCB)
+                  000852ac    00000024     driverlib_eabi.lib : sysctl.obj (.text:DCC_enableSingleShotMode)
+                  000852d0    00000024     spll_sample_study.obj (.text:EPWM_setDeadBandDelayPolarity)
+                  000852f4    00000024     rts2800_fpu32_eabi.lib : s_copysign.c.obj (.text)
+                  00085318    00000022     spll_sample_study.obj (.text:EPWM_setCounterCompareValue)
+                  0008533a    00000022     spll_sample_study.obj (.text:EPWM_setTripZoneAction)
+                  0008535c    00000021     rts2800_fpu32_eabi.lib : fd_toi28.asm.obj (.text)
+                  0008537d    00000020     spll_sample_study.obj (.text:ADC_enableInterrupt)
+                  0008539d    0000001f     spll_sample_study.obj (.text:EPWM_clearTripZoneFlag)
+                  000853bc    0000001f     spll_sample_study.obj (.text:EPWM_forceTripZoneEvent)
+                  000853db    0000001f     rts2800_fpu32_eabi.lib : fd_tol28.asm.obj (.text)
+                  000853fa    0000001e     driverlib_eabi.lib : sysctl.obj (.text:DCC_setCounter1ClkSource)
+                  00085418    0000001e     spll_sample_study.obj (.text:EPWM_setPhaseShift)
+                  00085436    0000001e     driverlib_eabi.lib : interrupt.obj (.text:Interrupt_initVectorTable)
+                  00085454    0000001e     rts2800_fpu32_eabi.lib : ll_cmp28.asm.obj (.text)
+                  00085472    0000001d     spll_sample_study.obj (.text:EPWM_setFallingEdgeDelayCount)
+                  0008548f    0000001d     spll_sample_study.obj (.text:EPWM_setRisingEdgeDelayCount)
+                  000854ac    0000001d     spll_sample_study.obj (.text:SCI_enableFIFO)
+                  000854c9    0000001d     rts2800_fpu32_eabi.lib : i_tofd28.asm.obj (.text)
+                  000854e6    0000001d                            : memcpy.c.obj (.text)
+                  00085503    0000001c     driverlib_eabi.lib : sysctl.obj (.text:DCC_setCounter0ClkSource)
+                  0008551f    0000001c     spll_sample_study.obj (.text:EPWM_enableADCTrigger)
+                  0008553b    0000001c     spll_sample_study.obj (.text:EPWM_setClockPrescaler)
+                  00085557    0000001c     rts2800_fpu32_eabi.lib : l_tofd28.asm.obj (.text)
+                  00085573    0000001a     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_getLowSpeedClock)
+                  0008558d    00000019     spll_sample_study.obj (.text:SCI_writeCharBlockingFIFO)
+                  000855a6    00000018     driverlib_eabi.lib : sci.obj (.text:SCI_disableModule)
+                  000855be    00000018     spll_sample_study.obj (.text:SCI_resetChannels)
+                  000855d6    00000018     spll_sample_study.obj (.text:SCI_resetRxFIFO)
+                  000855ee    00000018     spll_sample_study.obj (.text:SCI_resetTxFIFO)
+                  00085606    00000018     spll_sample_study.obj (.text:SysCtl_disablePeripheral)
+                  0008561e    00000018     rts2800_fpu32_eabi.lib : ll_aox28.asm.obj (.text)
+                  00085636    00000017     spll_sample_study.obj (.text:ADC_forceSOC)
+                  0008564d    00000017     driverlib_eabi.lib : adc.obj (.text:ADC_isBaseValid)
+                  00085664    00000017     spll_sample_study.obj (.text:ADC_isBaseValid)
+                  0008567b    00000017     device.obj (.text:SysCtl_enablePeripheral)
+                  00085692    00000017     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_enablePeripheral)
+                  000856a9    00000017     spll_sample_study.obj (.text:SysCtl_enablePeripheral)
+                  000856c0    00000017     rts2800_fpu32_eabi.lib : boot28.asm.obj (.text)
+                  000856d7    00000016     spll_sample_study.obj (.text:ADC_setPrescaler)
+                  000856ed    00000016     driverlib_eabi.lib : sysctl.obj (.text:DCC_disableDoneSignal)
+                  00085703    00000016                        : sysctl.obj (.text:DCC_enableDoneSignal)
+                  00085719    00000016                        : interrupt.obj (.text:Interrupt_defaultHandler)
+                  0008572f    00000015                        : sysctl.obj (.text:DCC_clearDoneFlag)
+                  00085744    00000015                        : sysctl.obj (.text:DCC_clearErrorFlag)
+                  00085759    00000015                        : sysctl.obj (.text:DCC_disableErrorSignal)
+                  0008576e    00000015                        : sysctl.obj (.text:DCC_enableErrorSignal)
+                  00085783    00000015     device.obj (.text:GPIO_unlockPortConfig)
+                  00085798    00000014     spll_sample_study.obj (.text:ADC_clearInterruptStatus)
+                  000857ac    00000014     driverlib_eabi.lib : sysctl.obj (.text:DCC_disableModule)
+                  000857c0    00000014                        : sysctl.obj (.text:DCC_enableModule)
+                  000857d4    00000014     spll_sample_study.obj (.text:EPWM_setTimeBaseCounterMode)
+                  000857e8    00000014     spll_sample_study.obj (.text:EPWM_setTimeBasePeriod)
+                  000857fc    00000014     driverlib_eabi.lib : gpio.obj (.text:GPIO_isPinValid)
+                  00085810    00000014     spll_sample_study.obj (.text:SCI_getTxFIFOStatus)
+                  00085824    00000013     spll_sample_study.obj (.text:ADC_enableConverter)
+                  00085837    00000013     driverlib_eabi.lib : sci.obj (.text:SCI_enableModule)
+                  0008584a    00000013     spll_sample_study.obj (.text:SCI_enableModule)
+                  0008585d    00000013     spll_sample_study.obj (.text:SCI_enableRxModule)
+                  00085870    00000013     spll_sample_study.obj (.text:SCI_enableTxModule)
+                  00085883    00000013     driverlib_eabi.lib : sci.obj (.text:SCI_isBaseValid)
+                  00085896    00000013     spll_sample_study.obj (.text:SCI_isBaseValid)
+                  000858a9    00000010     driverlib_eabi.lib : sysctl.obj (.text:DCC_isBaseValid)
+                  000858b9    00000010     device.obj (.text:Device_initGPIO)
+                  000858c9    00000010     driverlib_eabi.lib : flash.obj (.text:Flash_isCtrlBaseValid)
+                  000858d9    00000010                        : flash.obj (.text:Flash_isECCBaseValid)
+                  000858e9    00000010     rts2800_fpu32_eabi.lib : memccpy.c.obj (.text)
+                  000858f9    0000000f     device.obj (.text:ASysCtl_disableDCDC)
+                  00085908    0000000f     spll_sample_study.obj (.text:Interrupt_register)
+                  00085917    0000000f     spll_sample_study.obj (.text:sendSCIText)
+                  00085926    0000000e     rts2800_fpu32_eabi.lib : fd_sub28.asm.obj (.text)
+                  00085934    0000000d     driverlib_eabi.lib : interrupt.obj (.text:Interrupt_disableGlobal)
+                  00085941    0000000d                        : interrupt.obj (.text:Interrupt_enableGlobal)
+                  0008594e    0000000d     device.obj (.text:SysCtl_setLowSpeedClock)
+                  0008595b    0000000d     rts2800_fpu32_eabi.lib : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset)
+                  00085968    0000000c                            : args_main.c.obj (.text)
+                  00085974    0000000c                            : strchr.c.obj (.text)
+                  00085980    0000000b     device.obj (.text:SysCtl_disableWatchdog)
+                  0008598b    0000000b     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_isMCDClockFailureDetected)
+                  00085996    0000000b     spll_sample_study.obj (.text:__relaxed_cosf)
+                  000859a1    0000000b     spll_sample_study.obj (.text:__relaxed_sinf)
+                  000859ac    0000000b     rts2800_fpu32_eabi.lib : wcslen.c.obj (.text)
+                  000859b7    0000000a     driverlib_eabi.lib : interrupt.obj (.text:Interrupt_illegalOperationHandler)
+                  000859c1    0000000a                        : interrupt.obj (.text:Interrupt_nmiHandler)
+                  000859cb    00000009     spll_sample_study.obj (.text:__relaxed_sqrtf)
+                  000859d4    00000009     rts2800_fpu32_eabi.lib : _lock.c.obj (.text)
+                  000859dd    00000009                            : fd_neg28.asm.obj (.text)
+                  000859e6    00000008                            : copy_decompress_none.c.obj (.text:decompress:none)
+                  000859ee    00000008     f28004x_codestartbranch.obj (.text)
+                  000859f6    00000008     rts2800_fpu32_eabi.lib : strlen.c.obj (.text)
+                  000859fe    00000007     driverlib_eabi.lib : sysctl.obj (.text:SysCtl_resetMCD)
+                  00085a05    00000007     device.obj (.text:__error__)
+                  00085a0c    00000007     rts2800_fpu32_eabi.lib : memset.c.obj (.text)
+                  00085a13    00000006     spll_sample_study.obj (.text:Interrupt_clearACKGroup)
+                  00085a19    00000005     board.obj (.text:Board_init)
+                  00085a1e    00000005     rts2800_fpu32_eabi.lib : strcpy.c.obj (.text)
+                  00085a23    00000001     board.obj (.text:PinMux_init)
+                  00085a24    00000001     rts2800_fpu32_eabi.lib : startup.c.obj (.text)
 
 MODULE SUMMARY
 
        Module                        code    ro data   rw data
        ------                        ----    -------   -------
     .\
-       spll_sample_study.obj         3255    257       100    
+       spll_sample_study.obj         3348    257       102    
     +--+-----------------------------+-------+---------+---------+
-       Total:                        3255    257       100    
+       Total:                        3348    257       102    
                                                               
     .\device\
        device.obj                    428     85        0      
@@ -376,13 +376,13 @@ MODULE SUMMARY
        Stack:                        0       0         1016   
        Linker Generated:             0       36        0      
     +--+-----------------------------+-------+---------+---------+
-       Grand Total:                  11292   1424      1127   
+       Grand Total:                  11385   1424      1129   
 
 
 LINKER GENERATED COPY TABLES
 
 __TI_cinit_table @ 00081148 records: 2, size/record: 4, table size: 8
-	.data: load addr=0008112c, load size=00000012 bytes, run addr=0000a842, run size=0000002d bytes, compression=lzss
+	.data: load addr=0008112c, load size=00000012 bytes, run addr=0000a842, run size=0000002f bytes, compression=lzss
 	.bss: load addr=00081144, load size=00000004 bytes, run addr=0000a800, run size=00000042 bytes, compression=zero_init
 
 
@@ -421,12 +421,13 @@ address     data page           name
 0000a85e     2a1 (0000a840)     v_dc_ref
 0000a860     2a1 (0000a840)     i_ref_amplitude
 0000a862     2a1 (0000a840)     i_ref_inst
-0000a864     2a1 (0000a840)     __TI_enable_exit_profile_output
-0000a866     2a1 (0000a840)     __TI_cleanup_ptr
-0000a868     2a1 (0000a840)     __TI_dtors_ptr
-0000a86a     2a1 (0000a840)     _lock
-0000a86c     2a1 (0000a840)     _unlock
-0000a86e     2a1 (0000a840)     errno
+0000a864     2a1 (0000a840)     currentDutyFloat
+0000a866     2a1 (0000a840)     __TI_enable_exit_profile_output
+0000a868     2a1 (0000a840)     __TI_cleanup_ptr
+0000a86a     2a1 (0000a840)     __TI_dtors_ptr
+0000a86c     2a1 (0000a840)     _lock
+0000a86e     2a1 (0000a840)     _unlock
+0000a870     2a1 (0000a840)     errno
 
 00084000    2100 (00084000)     _ctypes_
 
@@ -442,41 +443,41 @@ page  address   name
 0     0008456c  ADC_SCALE_AC                     
 0     0008456e  ADC_SCALE_DC                     
 0     00084570  ADC_SCALE_L_I                    
-0     000851b2  ADC_setOffsetTrimAll             
-0     00083b12  ADC_setVREF                      
-0     000859b9  Board_init                       
-0     00085189  C$$EXIT                          
-0     000859c5  C2000Ware_libraries_init         
+0     00085213  ADC_setOffsetTrimAll             
+0     00083b9d  ADC_setVREF                      
+0     00085a19  Board_init                       
+0     000851ea  C$$EXIT                          
+0     00083fff  C2000Ware_libraries_init         
 0     00083107  Device_enableAllPeripherals      
-0     000838ad  Device_init                      
-0     0008585f  Device_initGPIO                  
+0     00083938  Device_init                      
+0     000858b9  Device_initGPIO                  
 0     00008000  Flash_initModule                 
-0     00083da0  GPIO_setAnalogMode               
-0     00083f5b  GPIO_setDirectionMode            
-0     00083a22  GPIO_setPadConfig                
-0     00083e84  GPIO_setPinConfig                
-0     00083ebb  GPIO_setQualificationMode        
-0     000856d2  Interrupt_defaultHandler         
-0     00083ef2  Interrupt_enable                 
-0     0008595d  Interrupt_illegalOperationHandler
-0     00083d29  Interrupt_initModule             
-0     000853d5  Interrupt_initVectorTable        
-0     00085967  Interrupt_nmiHandler             
-0     000859c6  PinMux_init                      
+0     00083e2b  GPIO_setAnalogMode               
+0     00083fb4  GPIO_setDirectionMode            
+0     00083aad  GPIO_setPadConfig                
+0     00083f0f  GPIO_setPinConfig                
+0     00083f46  GPIO_setQualificationMode        
+0     00085719  Interrupt_defaultHandler         
+0     00083f7d  Interrupt_enable                 
+0     000859b7  Interrupt_illegalOperationHandler
+0     00083db4  Interrupt_initModule             
+0     00085436  Interrupt_initVectorTable        
+0     000859c1  Interrupt_nmiHandler             
+0     00085a23  PinMux_init                      
 0     00081129  RamfuncsLoadEnd                  
 abs   00000129  RamfuncsLoadSize                 
 0     00081000  RamfuncsLoadStart                
 0     00008129  RamfuncsRunEnd                   
 abs   00000129  RamfuncsRunSize                  
 0     00008000  RamfuncsRunStart                 
-0     00083ceb  SCI_setConfig                    
+0     00083d76  SCI_setConfig                    
 0     00008125  SysCtl_delay                     
-0     0008390f  SysCtl_getClock                  
-0     0008552c  SysCtl_getLowSpeedClock          
+0     0008399a  SysCtl_getClock                  
+0     00085573  SysCtl_getLowSpeedClock          
 0     00083379  SysCtl_isPLLValid                
-0     00083ac5  SysCtl_selectOscSource           
-0     00083c6d  SysCtl_selectXTAL                
-0     00085201  SysCtl_selectXTALSingleEnded     
+0     00083b50  SysCtl_selectOscSource           
+0     00083cf8  SysCtl_selectXTAL                
+0     00085262  SysCtl_selectXTALSingleEnded     
 0     000832b1  SysCtl_setClock                  
 0     00081148  __TI_CINIT_Base                  
 0     00081150  __TI_CINIT_Limit                 
@@ -485,108 +486,109 @@ abs   00000129  RamfuncsRunSize
 0     00081144  __TI_Handler_Table_Limit         
 1     000007f8  __TI_STACK_END                   
 abs   000003f8  __TI_STACK_SIZE                  
-0     000850e0  __TI_auto_init_nobinit_nopinit   
-1     0000a866  __TI_cleanup_ptr                 
-0     0008502f  __TI_decompress_lzss             
-0     0008598c  __TI_decompress_none             
-1     0000a868  __TI_dtors_ptr                   
-1     0000a864  __TI_enable_exit_profile_output  
-0     00083fbd  __TI_ltoa                        
+0     00085141  __TI_auto_init_nobinit_nopinit   
+1     0000a868  __TI_cleanup_ptr                 
+0     00085090  __TI_decompress_lzss             
+0     000859e6  __TI_decompress_none             
+1     0000a86a  __TI_dtors_ptr                   
+1     0000a866  __TI_enable_exit_profile_output  
+0     00085031  __TI_ltoa                        
 abs   ffffffff  __TI_pprof_out_hndl              
 0     00082b51  __TI_printfi                     
 abs   ffffffff  __TI_prof_data_size              
 abs   ffffffff  __TI_prof_data_start             
-0     00085901  __TI_zero_init_nomemset          
+0     0008595b  __TI_zero_init_nomemset          
 0     00083640  __c28xabi_addd                   
-0     000855d7  __c28xabi_andll                  
-0     00085135  __c28xabi_cmpd                   
-0     000853f3  __c28xabi_cmpll                  
-0     00085405  __c28xabi_cmpull                 
-0     00082f6f  __c28xabi_divd                   
-0     0008515f  __c28xabi_divl                   
+0     0008561e  __c28xabi_andll                  
+0     00085196  __c28xabi_cmpd                   
+0     00085454  __c28xabi_cmpll                  
+0     00085466  __c28xabi_cmpull                 
+0     000836dc  __c28xabi_divd                   
+0     000851c0  __c28xabi_divl                   
 0     00083000  __c28xabi_divll                  
-0     0008517c  __c28xabi_divul                  
+0     000851dd  __c28xabi_divul                  
 0     00083076  __c28xabi_divull                 
-0     000852fb  __c28xabi_dtoi                   
-0     0008537a  __c28xabi_dtol                   
-0     00085468  __c28xabi_itod                   
-0     000854f6  __c28xabi_ltod                   
-0     0008516e  __c28xabi_modl                   
+0     0008535c  __c28xabi_dtoi                   
+0     000853db  __c28xabi_dtol                   
+0     000854c9  __c28xabi_itod                   
+0     00085557  __c28xabi_ltod                   
+0     000851cf  __c28xabi_modl                   
 0     0008303c  __c28xabi_modll                  
-0     00085183  __c28xabi_modul                  
+0     000851e4  __c28xabi_modul                  
 0     000830a5  __c28xabi_modull                 
-0     000836dc  __c28xabi_mpyd                   
-0     00085983  __c28xabi_negd                   
-0     000855df  __c28xabi_orll                   
-0     000858cc  __c28xabi_subd                   
-0     000855e7  __c28xabi_xorll                  
+0     00083767  __c28xabi_mpyd                   
+0     000859dd  __c28xabi_negd                   
+0     00085626  __c28xabi_orll                   
+0     00085926  __c28xabi_subd                   
+0     0008562e  __c28xabi_xorll                  
 n/a   UNDEFED   __c_args__                       
-0     000859ab  __error__                        
-0     0008593c  __relaxed_cosf                   
-0     00085947  __relaxed_sinf                   
-0     00085971  __relaxed_sqrtf                  
+0     00085a05  __error__                        
+0     00085996  __relaxed_cosf                   
+0     000859a1  __relaxed_sinf                   
+0     000859cb  __relaxed_sqrtf                  
 1     00000400  __stack                          
-0     0008590e  _args_main                       
-0     00085679  _c_int00                         
+0     00085968  _args_main                       
+0     000856c0  _c_int00                         
 0     00084000  _ctypes_                         
-1     0000a86a  _lock                            
-0     00085982  _nop                             
-0     0008597e  _register_lock                   
-0     0008597a  _register_unlock                 
-0     000859c7  _system_post_cinit               
-0     000859c3  _system_pre_init                 
-1     0000a86c  _unlock                          
-0     00085189  abort                            
+1     0000a86c  _lock                            
+0     000859dc  _nop                             
+0     000859d8  _register_lock                   
+0     000859d4  _register_unlock                 
+0     00085a24  _system_post_cinit               
+0     00082ffe  _system_pre_init                 
+1     0000a86e  _unlock                          
+0     000851ea  abort                            
 1     0000a856  ac_vol_adc_offset                
 1     0000a858  ac_vol_normalized                
-0     00083f8c  atoi                             
+0     00085000  atoi                             
 0     00080000  code_start                       
-0     00085293  copysign                         
-0     00085293  copysignl                        
+0     000852f4  copysign                         
+0     000852f4  copysignl                        
 1     0000a842  currentDuty                      
+1     0000a864  currentDutyFloat                 
 1     0000a846  data_ready_flag                  
-1     0000a86e  errno                            
-0     0008518b  exit                             
-0     00082e40  fastCurrentLoop_ISR              
+1     0000a870  errno                            
+0     000851ec  exit                             
+0     00082cd6  fastCurrentLoop_ISR              
 1     0000a84a  final_dc_voltage                 
 1     0000a84c  final_i_rms                      
 1     0000a848  final_rms                        
 1     0000a845  flatline_counter                 
-0     000839c8  frexp                            
-0     000839c8  frexpl                           
+0     00083a53  frexp                            
+0     00083a53  frexpl                           
 1     0000a85c  i_ac_meas                        
 1     0000a860  i_ref_amplitude                  
 1     0000a862  i_ref_inst                       
-0     00083e14  initADCA                         
-0     00085226  initADCB                         
-0     00083dda  initADCC                         
+0     00083e9f  initADCA                         
+0     00085287  initADCB                         
+0     00083e65  initADCC                         
 0     000834ec  initEPWM_HFL                     
-0     00083847  initEPWM_LFL                     
-0     00083a74  initSCIA                         
+0     000838d2  initEPWM_LFL                     
+0     00083aff  initSCIA                         
 0     00083597  ldexp                            
 0     00083597  ldexpl                           
 0     000831e7  main                             
-0     0008588f  memccpy                          
-0     00085485  memcpy                           
-0     000859b2  memset                           
+0     000858e9  memccpy                          
+0     000854e6  memcpy                           
+0     00085a0c  memset                           
 1     0000a843  pwm_flag                         
 1     0000a844  sample_counter                   
 0     00083597  scalbn                           
 0     00083597  scalbnl                          
-0     000858bd  sendSCIText                      
-0     00083b5e  slowVoltageLoop_ISR              
+0     00085917  sendSCIText                      
+0     00083be9  slowVoltageLoop_ISR              
 1     0000a800  spll1                            
-0     00083f29  sprintf                          
-0     0008591a  strchr                           
-0     000859be  strcpy                           
-0     0008599c  strlen                           
+0     00082fcc  sprintf                          
+0     00085974  strchr                           
+0     00085a1e  strcpy                           
+0     000859f6  strlen                           
 1     0000a852  sum_squares_ac                   
 1     0000a854  sum_squares_i_ac                 
 1     0000a84e  temp_sum_squares                 
 1     0000a850  temp_sum_squares_i               
 1     0000a85a  v_dc_meas                        
 1     0000a85e  v_dc_ref                         
-0     00085952  wcslen                           
+0     000859ac  wcslen                           
 
 
 GLOBAL SYMBOLS: SORTED BY Symbol Address 
@@ -606,8 +608,9 @@ page  address   name
 0     00081150  __TI_CINIT_Limit                 
 0     00081150  __TI_CINIT_Warm                  
 0     00082b51  __TI_printfi                     
-0     00082e40  fastCurrentLoop_ISR              
-0     00082f6f  __c28xabi_divd                   
+0     00082cd6  fastCurrentLoop_ISR              
+0     00082fcc  sprintf                          
+0     00082ffe  _system_pre_init                 
 0     00083000  __c28xabi_divll                  
 0     0008303c  __c28xabi_modll                  
 0     00083076  __c28xabi_divull                 
@@ -622,90 +625,89 @@ page  address   name
 0     00083597  scalbn                           
 0     00083597  scalbnl                          
 0     00083640  __c28xabi_addd                   
-0     000836dc  __c28xabi_mpyd                   
-0     00083847  initEPWM_LFL                     
-0     000838ad  Device_init                      
-0     0008390f  SysCtl_getClock                  
-0     000839c8  frexp                            
-0     000839c8  frexpl                           
-0     00083a22  GPIO_setPadConfig                
-0     00083a74  initSCIA                         
-0     00083ac5  SysCtl_selectOscSource           
-0     00083b12  ADC_setVREF                      
-0     00083b5e  slowVoltageLoop_ISR              
-0     00083c6d  SysCtl_selectXTAL                
-0     00083ceb  SCI_setConfig                    
-0     00083d29  Interrupt_initModule             
-0     00083da0  GPIO_setAnalogMode               
-0     00083dda  initADCC                         
-0     00083e14  initADCA                         
-0     00083e84  GPIO_setPinConfig                
-0     00083ebb  GPIO_setQualificationMode        
-0     00083ef2  Interrupt_enable                 
-0     00083f29  sprintf                          
-0     00083f5b  GPIO_setDirectionMode            
-0     00083f8c  atoi                             
-0     00083fbd  __TI_ltoa                        
+0     000836dc  __c28xabi_divd                   
+0     00083767  __c28xabi_mpyd                   
+0     000838d2  initEPWM_LFL                     
+0     00083938  Device_init                      
+0     0008399a  SysCtl_getClock                  
+0     00083a53  frexp                            
+0     00083a53  frexpl                           
+0     00083aad  GPIO_setPadConfig                
+0     00083aff  initSCIA                         
+0     00083b50  SysCtl_selectOscSource           
+0     00083b9d  ADC_setVREF                      
+0     00083be9  slowVoltageLoop_ISR              
+0     00083cf8  SysCtl_selectXTAL                
+0     00083d76  SCI_setConfig                    
+0     00083db4  Interrupt_initModule             
+0     00083e2b  GPIO_setAnalogMode               
+0     00083e65  initADCC                         
+0     00083e9f  initADCA                         
+0     00083f0f  GPIO_setPinConfig                
+0     00083f46  GPIO_setQualificationMode        
+0     00083f7d  Interrupt_enable                 
+0     00083fb4  GPIO_setDirectionMode            
+0     00083fff  C2000Ware_libraries_init         
 0     00084000  _ctypes_                         
 0     0008456c  ADC_SCALE_AC                     
 0     0008456e  ADC_SCALE_DC                     
 0     00084570  ADC_SCALE_L_I                    
-0     0008502f  __TI_decompress_lzss             
-0     000850e0  __TI_auto_init_nobinit_nopinit   
-0     00085135  __c28xabi_cmpd                   
-0     0008515f  __c28xabi_divl                   
-0     0008516e  __c28xabi_modl                   
-0     0008517c  __c28xabi_divul                  
-0     00085183  __c28xabi_modul                  
-0     00085189  C$$EXIT                          
-0     00085189  abort                            
-0     0008518b  exit                             
-0     000851b2  ADC_setOffsetTrimAll             
-0     00085201  SysCtl_selectXTALSingleEnded     
-0     00085226  initADCB                         
-0     00085293  copysign                         
-0     00085293  copysignl                        
-0     000852fb  __c28xabi_dtoi                   
-0     0008537a  __c28xabi_dtol                   
-0     000853d5  Interrupt_initVectorTable        
-0     000853f3  __c28xabi_cmpll                  
-0     00085405  __c28xabi_cmpull                 
-0     00085468  __c28xabi_itod                   
-0     00085485  memcpy                           
-0     000854f6  __c28xabi_ltod                   
-0     0008552c  SysCtl_getLowSpeedClock          
-0     000855d7  __c28xabi_andll                  
-0     000855df  __c28xabi_orll                   
-0     000855e7  __c28xabi_xorll                  
-0     00085679  _c_int00                         
-0     000856d2  Interrupt_defaultHandler         
-0     0008585f  Device_initGPIO                  
-0     0008588f  memccpy                          
-0     000858bd  sendSCIText                      
-0     000858cc  __c28xabi_subd                   
-0     00085901  __TI_zero_init_nomemset          
-0     0008590e  _args_main                       
-0     0008591a  strchr                           
-0     0008593c  __relaxed_cosf                   
-0     00085947  __relaxed_sinf                   
-0     00085952  wcslen                           
-0     0008595d  Interrupt_illegalOperationHandler
-0     00085967  Interrupt_nmiHandler             
-0     00085971  __relaxed_sqrtf                  
-0     0008597a  _register_unlock                 
-0     0008597e  _register_lock                   
-0     00085982  _nop                             
-0     00085983  __c28xabi_negd                   
-0     0008598c  __TI_decompress_none             
-0     0008599c  strlen                           
-0     000859ab  __error__                        
-0     000859b2  memset                           
-0     000859b9  Board_init                       
-0     000859be  strcpy                           
-0     000859c3  _system_pre_init                 
-0     000859c5  C2000Ware_libraries_init         
-0     000859c6  PinMux_init                      
-0     000859c7  _system_post_cinit               
+0     00085000  atoi                             
+0     00085031  __TI_ltoa                        
+0     00085090  __TI_decompress_lzss             
+0     00085141  __TI_auto_init_nobinit_nopinit   
+0     00085196  __c28xabi_cmpd                   
+0     000851c0  __c28xabi_divl                   
+0     000851cf  __c28xabi_modl                   
+0     000851dd  __c28xabi_divul                  
+0     000851e4  __c28xabi_modul                  
+0     000851ea  C$$EXIT                          
+0     000851ea  abort                            
+0     000851ec  exit                             
+0     00085213  ADC_setOffsetTrimAll             
+0     00085262  SysCtl_selectXTALSingleEnded     
+0     00085287  initADCB                         
+0     000852f4  copysign                         
+0     000852f4  copysignl                        
+0     0008535c  __c28xabi_dtoi                   
+0     000853db  __c28xabi_dtol                   
+0     00085436  Interrupt_initVectorTable        
+0     00085454  __c28xabi_cmpll                  
+0     00085466  __c28xabi_cmpull                 
+0     000854c9  __c28xabi_itod                   
+0     000854e6  memcpy                           
+0     00085557  __c28xabi_ltod                   
+0     00085573  SysCtl_getLowSpeedClock          
+0     0008561e  __c28xabi_andll                  
+0     00085626  __c28xabi_orll                   
+0     0008562e  __c28xabi_xorll                  
+0     000856c0  _c_int00                         
+0     00085719  Interrupt_defaultHandler         
+0     000858b9  Device_initGPIO                  
+0     000858e9  memccpy                          
+0     00085917  sendSCIText                      
+0     00085926  __c28xabi_subd                   
+0     0008595b  __TI_zero_init_nomemset          
+0     00085968  _args_main                       
+0     00085974  strchr                           
+0     00085996  __relaxed_cosf                   
+0     000859a1  __relaxed_sinf                   
+0     000859ac  wcslen                           
+0     000859b7  Interrupt_illegalOperationHandler
+0     000859c1  Interrupt_nmiHandler             
+0     000859cb  __relaxed_sqrtf                  
+0     000859d4  _register_unlock                 
+0     000859d8  _register_lock                   
+0     000859dc  _nop                             
+0     000859dd  __c28xabi_negd                   
+0     000859e6  __TI_decompress_none             
+0     000859f6  strlen                           
+0     00085a05  __error__                        
+0     00085a0c  memset                           
+0     00085a19  Board_init                       
+0     00085a1e  strcpy                           
+0     00085a23  PinMux_init                      
+0     00085a24  _system_post_cinit               
 1     00000400  __stack                          
 1     000007f8  __TI_STACK_END                   
 1     0000a800  spll1                            
@@ -728,12 +730,13 @@ page  address   name
 1     0000a85e  v_dc_ref                         
 1     0000a860  i_ref_amplitude                  
 1     0000a862  i_ref_inst                       
-1     0000a864  __TI_enable_exit_profile_output  
-1     0000a866  __TI_cleanup_ptr                 
-1     0000a868  __TI_dtors_ptr                   
-1     0000a86a  _lock                            
-1     0000a86c  _unlock                          
-1     0000a86e  errno                            
+1     0000a864  currentDutyFloat                 
+1     0000a866  __TI_enable_exit_profile_output  
+1     0000a868  __TI_cleanup_ptr                 
+1     0000a86a  __TI_dtors_ptr                   
+1     0000a86c  _lock                            
+1     0000a86e  _unlock                          
+1     0000a870  errno                            
 abs   00000129  RamfuncsLoadSize                 
 abs   00000129  RamfuncsRunSize                  
 abs   000003f8  __TI_STACK_SIZE                  
@@ -742,4 +745,4 @@ abs   ffffffff  __TI_prof_data_size
 abs   ffffffff  __TI_prof_data_start             
 n/a   UNDEFED   __c_args__                       
 
-[148 symbols]
+[149 symbols]
