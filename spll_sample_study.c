@@ -61,6 +61,7 @@ volatile float v_dc_ref = 380.0f;      // Target DC Bus Voltage
 volatile float i_ref_amplitude = 0.0f; // Output of Voltage Loop
 volatile float i_ref_inst = 0.0f;      // Instantaneous current reference
 volatile float currentDutyFloat = 0.0f;
+volatile float v_dc_filtered = 0.0f; // Clean, noise-free DC bus for math
 
 // --- FUNCTION PROTOTYPES ---
 void initEPWM_HFL(void);
@@ -131,7 +132,7 @@ void main(void)
             {
                 pwm_flag = true;
             }
-            else if (final_rms < 40.0f || final_dc_voltage >= 380.0f)
+            else if (final_rms < 40.0f || final_dc_voltage >= 410.0f)
             {
                 pwm_flag = false;
             }
@@ -148,7 +149,15 @@ __interrupt void slowVoltageLoop_ISR(void)
 {
     uint16_t raw_v_dc = ADC_readResult(ADCCRESULT_BASE, ADC_SOC_NUMBER0);
     v_dc_meas = (float)raw_v_dc * ADC_SCALE_DC;
-    
+    if (pwm_flag == true) 
+    {
+    v_dc_filtered = (v_dc_filtered * 0.995f) + (v_dc_meas * 0.005f);
+    }
+    else 
+    {
+        // When OFF, anchor everything to the raw measurement so it doesn't jump
+        v_dc_filtered = v_dc_meas; // Anchor the filter!
+    }
     // Voltage Loop PI Controller goes here...
        
     ADC_clearInterruptStatus(ADCC_BASE, ADC_INT_NUMBER1);
@@ -174,9 +183,9 @@ __interrupt void fastCurrentLoop_ISR(void)
     float peak_grid_vol = final_rms * 1.4142f; 
     float abs_v_ac_inst = fabsf(peak_grid_vol * spll1.sine);
 
-     float duty_feedforward = 0.0f;
-    if (v_dc_meas > 10.0f) { 
-        duty_feedforward = 1.0f - (abs_v_ac_inst / v_dc_meas);     // D = 1 - (Vin/Vout)
+     float duty_feedforward = 0.0f;// D = 1 - (Vin/Vout)
+    if (v_dc_filtered > 10.0f) { 
+        duty_feedforward = 1.0f - (abs_v_ac_inst / v_dc_filtered); 
     }
 
     currentDutyFloat = duty_feedforward ;
@@ -407,3 +416,5 @@ void initEPWM_LFL(void)
 //* find a method to ofset auto correction
 //* find a method to make all the sense are ok at the initially INDUSTRIAL PRE-FLIGHT CHECKS and other safty feature like sensor fault etc
 // flat line issue wll solve when auto offset adjust is implemented
+// loop time of each isr should be calculated and need to adjust by using CLA 
+//protection yaalm implememt cheyyanam based on the example code
