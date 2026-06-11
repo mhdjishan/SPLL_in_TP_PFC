@@ -22,7 +22,7 @@
 
 //limits
 #define MAX_DUTY 0.95f
-#define MIN_DUTY 0.01f
+#define MIN_DUTY 0.05f
 
 // --- SCALING FACTORS ---
 const float ADC_SCALE_AC  = 339.0f / 2048.0f;
@@ -62,6 +62,8 @@ volatile float i_ref_amplitude = 0.0f; // Output of Voltage Loop
 volatile float i_ref_inst = 0.0f;      // Instantaneous current reference
 volatile float currentDutyFloat = 0.0f;
 volatile float v_dc_filtered = 0.0f; // Clean, noise-free DC bus for math
+//faster loop variables
+volatile float v_dc_fast_meas = 0.0f; // Instantaneous DC read for 50kHz feedforward
 
 // --- FUNCTION PROTOTYPES ---
 void initEPWM_HFL(void);
@@ -132,7 +134,7 @@ void main(void)
             {
                 pwm_flag = true;
             }
-            else if (final_rms < 40.0f || final_dc_voltage >= 410.0f)
+            else if (final_rms < 40.0f || final_dc_voltage >= 380.0f) 
             {
                 pwm_flag = false;
             }
@@ -147,18 +149,18 @@ void main(void)
 // SLOW LOOP: 10kHz (Triggered by EPWM6 SOCB prescaled by 5)
 __interrupt void slowVoltageLoop_ISR(void)
 {
-    uint16_t raw_v_dc = ADC_readResult(ADCCRESULT_BASE, ADC_SOC_NUMBER0);
+    uint16_t raw_v_dc = ADC_readResult(ADCCRESULT_BASE, ADC_SOC_NUMBER1);
     v_dc_meas = (float)raw_v_dc * ADC_SCALE_DC;
-    if (pwm_flag == true) 
-    {
-    v_dc_filtered = (v_dc_filtered * 0.995f) + (v_dc_meas * 0.005f);
-    }
-    else 
-    {
-        // When OFF, anchor everything to the raw measurement so it doesn't jump
-        v_dc_filtered = v_dc_meas; // Anchor the filter!
-    }
-    // Voltage Loop PI Controller goes here...
+    // if (pwm_flag == true) 
+    // {
+    // // v_dc_filtered = (v_dc_filtered * 0.995f) + (v_dc_meas * 0.005f);
+    // }
+    // else 
+    // {
+    //     // When OFF, anchor everything to the raw measurement so it doesn't jump
+    //     v_dc_filtered = v_dc_meas; // Anchor the filter!
+    // }
+    // // Voltage Loop PI Controller goes here...
        
     ADC_clearInterruptStatus(ADCC_BASE, ADC_INT_NUMBER1);
     Interrupt_clearACKGroup(INTERRUPT_ACK_GROUP1);
@@ -170,6 +172,9 @@ __interrupt void fastCurrentLoop_ISR(void)
 {
     uint16_t raw_i_ac = ADC_readResult(ADCARESULT_BASE, ADC_SOC_NUMBER0);
     uint16_t raw_v_ac = ADC_readResult(ADCBRESULT_BASE, ADC_SOC_NUMBER0);
+    uint16_t raw_v_dc_fast = ADC_readResult(ADCCRESULT_BASE, ADC_SOC_NUMBER0);
+    v_dc_fast_meas = (float)raw_v_dc_fast * ADC_SCALE_DC;
+    v_dc_filtered = (v_dc_filtered * 0.995f) + (v_dc_fast_meas * 0.005f);
 
     // Update global normalized voltage
     ac_vol_normalized = ((float)raw_v_ac - ADC_OFFSET) / ADC_OFFSET;
@@ -185,7 +190,10 @@ __interrupt void fastCurrentLoop_ISR(void)
 
      float duty_feedforward = 0.0f;// D = 1 - (Vin/Vout)
     if (v_dc_filtered > 10.0f) { 
-        duty_feedforward = 1.0f - (abs_v_ac_inst / v_dc_filtered); 
+        duty_feedforward = 1.0f - (abs_v_ac_inst /v_dc_filtered); 
+        if (duty_feedforward < 0.0f ) {
+          duty_feedforward = MIN_DUTY ;
+        }
     }
 
     currentDutyFloat = duty_feedforward ;
@@ -254,6 +262,7 @@ __interrupt void fastCurrentLoop_ISR(void)
         temp_sum_squares = 0.0f;
         temp_sum_squares_i = 0.0f; 
         data_ready_flag = true;
+        v_dc_filtered = v_dc_fast_meas; // Anchor the filter!
     }
 
     ADC_clearInterruptStatus(ADCA_BASE, ADC_INT_NUMBER1);
@@ -296,12 +305,18 @@ void initADCC(void)
     ADC_setPrescaler(ADCC_BASE, ADC_CLK_DIV_4_0);
     ADC_enableConverter(ADCC_BASE);
 
-    ADC_setupSOC(ADCC_BASE, ADC_SOC_NUMBER0, ADC_TRIGGER_EPWM6_SOCB, ADC_CH_ADCIN2, 15);
-    ADC_setInterruptSource(ADCC_BASE, ADC_INT_NUMBER1, ADC_SOC_NUMBER0);
+    // FAST LOOP (50kHz) -> Priority 1 (SOC0) 
+    ADC_setupSOC(ADCC_BASE, ADC_SOC_NUMBER0, ADC_TRIGGER_EPWM6_SOCA, ADC_CH_ADCIN2, 15);
+    // SLOW LOOP (10kHz) -> Priority 2 (SOC1)
+    // Generates the 10kHz interrupt. Safely waits 250ns if a collision occurs.
+    ADC_setupSOC(ADCC_BASE, ADC_SOC_NUMBER1, ADC_TRIGGER_EPWM6_SOCB, ADC_CH_ADCIN2, 15);
+
+    ADC_setInterruptSource(ADCC_BASE, ADC_INT_NUMBER1, ADC_SOC_NUMBER1);
     ADC_enableInterrupt(ADCC_BASE, ADC_INT_NUMBER1);
     ADC_clearInterruptStatus(ADCC_BASE, ADC_INT_NUMBER1);
     
     ADC_forceSOC(ADCC_BASE, ADC_SOC_NUMBER0);
+    ADC_forceSOC(ADCC_BASE, ADC_SOC_NUMBER1);
     Interrupt_enable(INT_ADCC1);
 }
 
